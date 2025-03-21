@@ -1,0 +1,175 @@
+.ls {
+     background: #001030;
+    color: white;
+    height: 100vh;
+    width: 15%; /* ✅ Allow it to expand */
+    min-width: 300px; /* ✅ Prevent shrinking */
+
+    .ls-top {
+        padding: 20px;
+    }
+
+    .ls-nav {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+
+        .logo {
+            max-width: 140px;
+        }
+
+        .menu {
+            img {
+                max-height: 20px;
+                opacity: 0.6;
+                cursor: pointer;
+            }
+        }
+    } 
+
+    .ls-search {
+        background-color: #002670;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 12px;
+        margin-top: 20px;
+
+        img {
+            width: 16px;
+        }
+
+        input {
+            background: transparent;
+            border: none;
+            color: white;
+            outline: none;
+            font-size: 11px;
+            flex: 1;
+
+            &::placeholder {
+                color: #c8c8c8;
+            }
+        }
+    }
+
+    .ls-list {
+        display: flex;
+        flex-direction: column;
+        height: 70%;
+        overflow-y: scroll;
+
+        .friend {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px;
+            border-bottom: 1px solid #dddddd36;
+            cursor: pointer;
+
+            &:hover {
+                background-color: #077eff;
+                
+            }
+
+            img {
+                width: 35px;
+                aspect-ratio: 1/1;
+                border-radius: 50%;
+            }
+
+            div {
+                display: flex;
+                flex-direction: column;
+
+                span {
+                    color: #ffffff;
+                    font-size: 10px;
+                    
+                    &:hover {
+                        color: white;
+                    }
+                }
+
+                p {
+                    color: rgb(227, 226, 226);
+                    font-size: 14px;
+                }
+            }
+        }
+    }
+}
+
+.ls-nav .menu {
+    position: relative;
+    padding: 10px 0;
+
+}
+.menu .sub-menu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    width: 220px;
+    padding: 20px;
+    border-radius: 5px;
+    background-color: white;
+    color: black;
+    display: none;
+
+    a{
+        text-decoration: none;
+        color: black;
+    }
+}
+
+.sub-menu hr {
+    border: none;
+    height: 1px;
+    background: #a4a4a4;
+    margin: 5px 0px;
+}
+
+.sub-menu p {
+    cursor: pointer;
+    font-size: 14   px;
+    padding: 8px 10px; /* Add padding for better spacing */
+    border-radius: 3px; /* Slight rounding for a softer look */
+    transition: background 0.3s ease; /* Smooth transition effect */
+    color: black;
+    
+        
+    
+}
+
+.sub-menu p:hover {
+    background-color: #077eff; /* Change to desired hover background */
+    color: white; /* Ensure text is visible on hover */
+}
+
+
+.menu:hover .sub-menu {
+    display: block;
+
+    
+}
+
+.not-found {
+    font-size: 12px;
+    padding: 20px;
+}
+
+.friend-info {
+    flex-grow: 1;
+    margin-left: 10px;
+    
+  }
+  
+  .status {
+    display: flex;
+    align-items: center;
+  }
+
+  .last-seen {
+    font-size: 18px;
+    color: rgb(0, 81, 255);
+  }

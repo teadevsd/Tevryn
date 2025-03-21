@@ -1,0 +1,52 @@
+.chat {
+    min-height: 100vh;
+    background: linear-gradient(#596aff, #383699);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.chat-container {
+    width: 100%;
+    height: 100vh;
+    background-color: aliceblue;
+    display: grid;
+    grid-template-columns: 2fr 2fr 1fr; /* ⬆ Increased LeftSideBar width */
+    transition: grid-template-columns 0.3s ease-in-out;
+}
+
+
+
+/* Default: SelectChat (Takes 2fr), RightSidebar Hidden */
+.select-chat {
+    grid-column: span 2; /* Takes two-thirds of the layout */
+    background: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* ChatBox should take 2fr and RightSidebar should appear */
+.chat-box {
+    width: 100%;
+    background: white;
+    display: flex;
+    flex-direction: column;
+}
+
+.right-sidebar {
+    width: 100%;
+    background-color: #f1f1f1;
+    overflow-y: auto;
+}
+
+/* Hide RightSidebar when no chat is selected */
+.hidden {
+    display: none;
+}
+
+.left-sidebar {
+    min-width: 300px; /* ✅ Prevents shrinking */
+    width: 100%;
+}
+
