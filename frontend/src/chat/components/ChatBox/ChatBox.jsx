@@ -2,11 +2,12 @@ import React, { useContext, useEffect, useState, useRef } from "react";
 import { io } from "socket.io-client";
 import "./ChatBox.css";
 import assets from "../../../assets/assets";
-import { AppContext } from "../../context/AppContext";
+
 import Axios from "../../../lib/Axios";
 import SelectChat from "../SelectChat/SelectChat";
 import RightSideBar from "../RightSideBar/RightSideBar";
 import { summaryAPI } from "../../../common/summaryAPI";
+import { AppContext } from "../../../context/AppContext";
 
 const socket = io("http://localhost:2323");
 

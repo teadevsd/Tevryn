@@ -1,8 +1,8 @@
 import { createContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import Axios from "../../lib/Axios";
-import { summaryAPI } from "../../common/summaryAPI";
 import { toast } from "react-toastify";
+import Axios from "../lib/Axios";
+import { summaryAPI } from "../common/summaryAPI";
 
 export const AppContext = createContext();
 
@@ -13,36 +13,52 @@ const AppContextProvider = (props) => {
     return storedUser ? JSON.parse(storedUser) : null;
   });
 
+
   const loadUserData = async () => {
     try {
+      console.log("🔄 Running loadUserData...");
       const accessToken = localStorage.getItem("accessToken");
   
       if (!accessToken) {
-        console.error("No access token found in localStorage.");
-        navigate("/auth", { replace: true }); // 🔥 Ensure proper redirect if token is missing
-        return;
+        console.error("⛔ No access token found.");
+        return; // Prevent navigation
       }
   
       const response = await Axios.get(summaryAPI.getUserProfile.url, {
         headers: { Authorization: `Bearer ${accessToken}` },
       });
   
-      if (!response.data.success) throw new Error("Failed to fetch user data");
+      if (!response.data.success) throw new Error("❌ Failed to fetch user data");
   
       setUserData(response.data.data);
-      localStorage.setItem("user", JSON.stringify(response.data.data)); // ✅ Save user data to localStorage
+      localStorage.setItem("user", JSON.stringify(response.data.data));
+  
+      // Check if there's a stored redirect path
+      const redirectPath = localStorage.getItem("redirectPath");
+      console.log("🛣️ Redirect Path:", redirectPath);
+  
+      if (redirectPath) {
+        navigate(redirectPath, { replace: true });
+        localStorage.removeItem("redirectPath");
+      }
     } catch (error) {
       console.error("Error fetching user:", error.response?.data || error.message);
-      navigate("/auth", { replace: true }); // 🔥 Redirect if error occurs
     }
   };
-
+  
+  
+  
+ 
+ 
+ 
   // ✅ Only run loadUserData() if userData is null (prevents unnecessary reloading)
   useEffect(() => {
     if (!userData) {
       loadUserData();
     }
-  }, [userData]);
+    // ✅ Run this effect only once when the component mounts
+  }, []);
+  
 
   // ✅ Logout function with proper navigation to "/"
   const logout = async () => {

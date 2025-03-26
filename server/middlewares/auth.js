@@ -40,25 +40,47 @@ dotenv.config();
 //     }
 // };
 
+ 
+
+// exports.Auth = (req, res, next) => {
+//     const token = req.headers.authorization?.split(" ")[1]; // Extract token
+//     if (!token) {
+//         console.log("No token found in request");
+//         return res.status(401).json({ message: "No token provided", success: false });
+//     }
+
+//     jwt.verify(token, process.env.SECRET_KEY_ACCESS_TOKEN, (err, decoded) => {
+//         if (err) {
+//             console.log("Invalid token:", err.message);
+//             return res.status(401).json({ message: "Invalid token", success: false });
+//         }
+
+//         console.log("Decoded Token:", decoded);
+//         req.user = decoded;  // Attach user info
+//         next();
+//     });
+// };
+
 
 
 exports.Auth = (req, res, next) => {
-    const token = req.headers.authorization?.split(" ")[1]; // Extract token
-    if (!token) {
-        console.log("No token found in request");
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
         return res.status(401).json({ message: "No token provided", success: false });
     }
 
+    const token = authHeader.split(" ")[1];
+
     jwt.verify(token, process.env.SECRET_KEY_ACCESS_TOKEN, (err, decoded) => {
         if (err) {
-            console.log("Invalid token:", err.message);
+            if (err.name === "TokenExpiredError") {
+                return res.status(401).json({ message: "Token expired, please log in again", success: false });
+            }
             return res.status(401).json({ message: "Invalid token", success: false });
         }
 
-        console.log("Decoded Token:", decoded);
-        req.user = decoded;  // Attach user info
+        req.user = { userId: decoded.userId }; // ✅ Ensure correct userId extraction
         next();
     });
 };
 
-  

@@ -19,17 +19,19 @@ import teachat_bbb from './teachat_bbb.png'
 import teachat_fff from './teachat_fff.png'
 import chat from './chat.png'
 import conference from './conference.png'
-import note from './note.png'
+import noteIcon from './noteIcon.png'
 import chat_Illustration from './chat_icon.png'
 import welcome from './welcome.jpg'
 import bgConference from './bgConference.jpg'
+import noteBG from './noteBG.jpg'
 
 const assets = {
     welcome,
     bgConference,
     chat,
     conference,
-    note,
+    noteIcon,
+    noteBG,
     avatar_icon,
     chat_Illustration,
     gallery_icon,

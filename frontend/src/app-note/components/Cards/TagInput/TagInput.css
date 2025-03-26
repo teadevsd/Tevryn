@@ -1,0 +1,59 @@
+.tagCont {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.inputLabelTag {
+    width: 50%;
+    padding: 8px 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+    background-color: transparent;
+    font-style: italic;
+}
+
+.tagButton, .removeTagBtn {
+    padding: 8px 10px;
+    border: none;
+    color: black;
+    border-radius: 4px;
+    font-size: 14px;
+    background-color: transparent;
+    cursor: pointer;
+    margin-left: 10px;
+    transition: background-color 0.2s ease-in-out;
+
+    &:hover {
+        background-color: rgb(247, 195, 136);
+    }
+}
+
+/* Ensure each tag has spacing and does not join together */
+.tagsContainer {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.tag {
+    font-style: italic;
+    font-size: 12px;
+    background-color: rgba(211, 211, 211, 0.566);
+    padding: 6px 10px;
+    border-radius: 4px;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.removeTagBtn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    font-size: 14px;
+    padding: 4px;
+    cursor: pointer;
+}

@@ -5,6 +5,7 @@ const jwt = require("jsonwebtoken");
 const uploadImageCloudinary = require('../../utils/cloudinary');
 const { generateSuggestedUsernames } = require('../../utils/generateUsername');
 const bcrypt = require("bcrypt"); // ✅ Ensure bcrypt is imported
+const { setTokenCookies } = require("../../utils/setTokenCookies");
 
 
 exports.registerUser = async (req, res) => {
@@ -66,42 +67,77 @@ exports.registerUser = async (req, res) => {
       user.lastSeen = new Date();
       await user.save();
   
-      // ✅ Generate both tokens
+      // ✅ Generate tokens
       const accessToken = generateAccessToken(user._id);
       const refreshToken = generateRefreshToken(user._id);
   
-      res.json({ message: "Login successful", accessToken, refreshToken, user });
+      // ✅ Store tokens in cookies
+      setTokenCookies(res, accessToken, refreshToken);
+  
+      // ✅ Send tokens in response
+      res.json({ 
+        message: "Login successful", 
+        user, 
+        accessToken, 
+        refreshToken 
+      });
     } catch (error) {
       console.error("Login error:", error);
-      res.status(500).json({ message: "Server error", error: true });
+      res.status(500).json({ message: "Server error" });
     }
-  };
+};
+
   
 
-  exports.refreshToken = (req, res) => {
-    const { refreshToken } = req.body;
+exports.refreshToken = async (req, res) => {
+    const { refreshToken } = req.body; // ✅ Read from request body instead of cookies
     if (!refreshToken) return res.status(401).json({ message: "No token provided" });
   
     try {
-      const decoded = jwt.verify(refreshToken, process.env.SECRET_KEY_REFRESH_TOKEN); // 🔥 Fixed typo here!
-      const newAccessToken = generateAccessToken(decoded.userId); // Use function for consistency
+      const decoded = jwt.verify(refreshToken, process.env.SECRET_KEY_REFRESH_TOKEN);
+  
+      // ✅ Issue new tokens before removing old refresh token
+      const newAccessToken = exports.generateAccessToken(decoded.userId);
+      const newRefreshToken = exports.generateRefreshToken(decoded.userId);
+  
+      // ✅ Store new refresh token before removing the old one
+      await User.updateOne({ _id: decoded.userId }, { $push: { refreshTokens: newRefreshToken } });
+      await User.updateOne({ _id: decoded.userId }, { $pull: { refreshTokens: refreshToken } });
+  
+      // ✅ Send tokens as secure HTTP-only cookies
+      res.cookie("refreshToken", newRefreshToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "Strict",
+      });
   
       res.json({ accessToken: newAccessToken });
     } catch (error) {
       return res.status(403).json({ message: "Invalid or expired refresh token" });
     }
   };
+  
 
 
-exports.logout = async (req, res) => {
+  exports.logout = async (req, res) => {
     try {
         const userId = req.user?._id;
 
         if (userId) {
             await User.findByIdAndUpdate(userId, { lastSeen: new Date() });
+
+            // ✅ Optionally remove refresh token from the database if stored
+            await User.updateOne({ _id: userId }, { $unset: { refreshToken: 1 } });
         }
 
+        // ✅ Clear both access and refresh tokens
         res.clearCookie("accessToken", {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "Strict",
+        });
+
+        res.clearCookie("refreshToken", {
             httpOnly: true,
             secure: process.env.NODE_ENV === "production",
             sameSite: "Strict",
@@ -120,6 +156,7 @@ exports.logout = async (req, res) => {
         });
     }
 };
+
 
 // exports.getUserProfile = async (req, res) => {
 //     try {

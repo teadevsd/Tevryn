@@ -3,13 +3,14 @@ import "./login.css";
 import assets from "../../../assets/assets";
 import AxiosToastError from "../../../lib/AxiosToastError";
 import Axios from "../../../lib/Axios";
-import { AppContext } from "../../context/AppContext";
+
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import { parsePhoneNumberFromString } from "libphonenumber-js";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
 import { summaryAPI } from "../../../common/summaryAPI";
+import { AppContext } from "../../../context/AppContext";
 
 const Login = () => {
   const { setUserData } = useContext(AppContext);
@@ -108,30 +109,36 @@ const Login = () => {
         ...summaryAPI.login,
         data: { email: data.email, password: data.password },
       });
-  
-      console.log("Login Response:", response.data); // Debugging
-  
+
+      console.log("Login Response:", response.data); // ✅ Debugging Step
+
       if (response.data.error) {
         toast.error(response.data.message, toastOptions);
         return;
       }
-  
+
       if (response.data.accessToken && response.data.refreshToken) {
         localStorage.setItem("accessToken", response.data.accessToken);
         localStorage.setItem("refreshToken", response.data.refreshToken);
-        console.log("Stored Token:", localStorage.getItem("accessToken"));
+      } else {
+        console.error("Access token is missing from the response");
       }
-  
+
       if (response.data.user) {
         setUserData(response.data.user);
         toast.success("Login successful!", toastOptions);
-        setTimeout(() => navigate("/chat"), 1000);
+        setTimeout(() => {
+          handleLoginSuccess();
+        }, 1000);
       }
     } catch (error) {
-      console.error("Login Error:", error);
       AxiosToastError(error);
     }
-  };
+};
+
+  
+
+  
   
 
 
@@ -157,6 +164,12 @@ const Login = () => {
     } else {
       handleLogin(e);
     }
+  };
+
+  const handleLoginSuccess = () => {
+    const redirectPath = localStorage.getItem("redirectPath") || "/"; // Default to home if no path
+    localStorage.removeItem("redirectPath"); // Clean up after redirecting
+    navigate(redirectPath, { replace: true });
   };
 
   return (
@@ -243,7 +256,7 @@ const Login = () => {
           </p>
         </div>
 
-        <button type="submit" disabled={!validValues}>
+        <button type="submit" disabled={!validValues} >
           {currentState === "Sign up" ? "Create account" : "Login now"}
         </button>
       </form>

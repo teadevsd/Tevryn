@@ -5,7 +5,8 @@ import { summaryAPI } from "../../../common/summaryAPI";
 import { toast } from "react-toastify";
 import Axios from "../../../lib/Axios";
 import { useNavigate } from "react-router-dom";
-import { AppContext } from "../../context/AppContext";
+import { AppContext } from "../../../context/AppContext";
+
 
 const RightSideBar = ({ visible, chatUser, mediaFiles = [] }) => {
   const navigate = useNavigate();

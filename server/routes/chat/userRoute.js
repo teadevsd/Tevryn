@@ -7,10 +7,10 @@ const router = express.Router();
 
 router.post('/signup', registerUser);
 router.post('/login', login);
-router.post('/logout', Auth, logout);
+router.post('/logout', logout);
+router.post('/refresh-token', refreshToken);
 router.get('/user-details', Auth, getUserProfile);
 router.put('/update-profile', Auth, updateUserProfile);
-router.post('/refresh-token', Auth, refreshToken);
 router.post('/check-username', Auth, checkUsername);
 router.put('/upload-avatar', Auth, upload.single('avatar'), uploadAvatarController);
 

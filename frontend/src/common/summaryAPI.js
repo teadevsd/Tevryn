@@ -64,7 +64,29 @@ export const summaryAPI = {
         method: 'post'
     },
     refreshToken: {
-        url: 'api/v1/user/refresh-token',
+        url: 'api/v1/user/refresh-token',  // ✅ Match backend route
         method: 'post'
+      },
+            
+    //note
+    getAllNotes: {
+        url: 'api/v1/note/get-note',
+        method: 'get'
+    },
+    addNote: {
+        url: 'api/v1/note/add-note',
+        method: 'post'
+    },
+    editNote: {
+        url: 'api/v1/note/edit-note/',
+        method: 'put'
+    },
+    updateNote: {
+        url: 'api/v1/note/update-note/',
+        method: 'put'
+    },
+    deleteNote: {
+        url: 'api/v1/note/delete-note/',
+        method: 'delete'
     }
 }

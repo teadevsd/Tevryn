@@ -2,10 +2,11 @@ import React, { useContext, useEffect, useState } from "react";
 import "./LeftSideBar.css";
 import assets from "../../../assets/assets";
 import { Link, useNavigate } from "react-router-dom";
-import { AppContext } from "../../context/AppContext";
+
 import Axios from "../../../lib/Axios";
 import { summaryAPI } from "../../../common/summaryAPI";
 import { toast } from "react-toastify";
+import { AppContext } from "../../../context/AppContext";
 
 const LeftSideBar = ({ onSelectUser }) => {
   const { logout, userData } = useContext(AppContext);
@@ -109,6 +110,29 @@ const LeftSideBar = ({ onSelectUser }) => {
     return date.toLocaleDateString();
   };
 
+  const handleNavigateToNotes = async () => {
+    try {
+      const accessToken = localStorage.getItem("accessToken");
+      if (!accessToken) {
+        toast.error("You need to log in first.");
+        return;
+      }
+  
+      const response = await Axios.get(summaryAPI.getUserProfile.url, {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      });
+  
+      if (response.data.success && response.data.data) {
+        navigate("/note"); // ✅ User exists, navigate to /note
+      } else {
+        toast.error("Account not found. Please sign up first.");
+      }
+    } catch (error) {
+      toast.error("Error checking account. Please try again.");
+      console.error("Error verifying user:", error);
+    }
+  };
+  
   const handleLogout = () => {
     logout(); // Call logout from AppContext
   };
@@ -134,7 +158,7 @@ const LeftSideBar = ({ onSelectUser }) => {
               <hr />
               <p>Conference Call</p>
               <hr />
-              <p>Note Taking</p>
+              <p onClick={handleNavigateToNotes}>Note App</p>
               <hr />
               <p onClick={handleLogout}>Logout</p>
             </div>

@@ -6,7 +6,8 @@ import Axios from "../../../lib/Axios";
 import { summaryAPI } from "../../../common/summaryAPI";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
-import { AppContext } from "../../context/AppContext";
+import { AppContext } from "../../../context/AppContext";
+
 
 
 const ProfileUpdate = () => {

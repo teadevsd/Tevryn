@@ -8,6 +8,7 @@ const { connectDB } = require("./config/connectDB");
 const userRoute = require("./routes/chat/userRoute");
 const friendsRoute = require("./routes/chat/friendsRoute");
 const messageRoute = require("./routes/chat/messageRoute");
+const noteRoute = require("./routes/notes/noteRoute");
 
 
 const cookieParser = require("cookie-parser");
@@ -24,6 +25,7 @@ app.use(
     origin: "http://localhost:5173",
     credentials: true,
     allowedHeaders: ["Content-Type", "Authorization"],
+    methods: ["GET", "POST", "PUT", "DELETE"],
   })
 );
 app.use(express.json());
@@ -33,6 +35,11 @@ app.use(cookieParser());
 app.use("/api/v1/user", userRoute);
 app.use("/api/v1/friends", friendsRoute);
 app.use("/api/v1/messages", messageRoute);
+
+
+//note-route
+app.use("/api/v1/note", noteRoute);
+
 
 
 // Initialize Socket.io

@@ -1,0 +1,49 @@
+.searchCont {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    max-width: 300px;
+    position: relative;
+    border-radius: 30px;
+    /* border: 1px solid grey; */
+    background-color: white;
+    /* padding: 2px; */
+}
+
+.searchCont input {
+    flex: 1;
+    padding: 8px 40px 8px 15px; /* Make space for icons */
+    min-width: 250px;
+    max-width: 100%;
+    border-radius: 10px;
+    outline: none;
+    border: none;
+    font-size: 13px;
+    color: black;
+    background: transparent;
+}
+
+.searchCont input::placeholder {
+    color: gray;
+    opacity: 0.8;
+}
+
+.searchCont svg {
+    position: absolute;
+    cursor: pointer;
+    color: grey;
+    font-size: 16px;
+    transition: color 0.3s ease-in-out;
+}
+
+.searchCont .close-icon {
+    right: 35px;
+}
+
+.searchCont .search-icon {
+    right: 10px;
+}
+
+.searchCont svg:hover {
+    color: black;
+}

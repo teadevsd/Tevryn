@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useContext } from "react";
 import { toast } from "react-toastify";
-import { AppContext } from "../../../context/AppContext";
+
 import Axios from "../../../../lib/Axios";
 import "./AddFriend.css"; // Import external CSS
 import { summaryAPI } from "../../../../common/summaryAPI";
 import { useNavigate } from "react-router-dom";
+import { AppContext } from "../../../../context/AppContext";
 
 const AddFriend = () => {
   const { userData } = useContext(AppContext);

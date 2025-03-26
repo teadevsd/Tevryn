@@ -1,10 +1,23 @@
-import React from "react";
+import React, { useContext } from "react";
 import "./home.css";
-import assets from "../../../assets/assets"; // Ensure your assets path is correct
+import assets from "../../../assets/assets";
 import { Link, useNavigate } from "react-router-dom";
+import { AppContext } from "../../../context/AppContext";
 
 const Home = () => {
   const navigate = useNavigate();
+  const { userData } = useContext(AppContext);
+
+  // Function to check authentication before navigation
+  const handleNavigation = (path) => {
+    if (!userData) {
+      localStorage.setItem("redirectPath", path); // Store the intended path
+      navigate("/auth");
+    } else {
+      navigate(path);
+    }
+  };
+  
 
   return (
     <div className="home-container">
@@ -19,25 +32,21 @@ const Home = () => {
         <p className="tagline">Connect, Chat, and Capture Ideas Seamlessly.</p>
 
         <div className="content">
-
-          <div className="fullContent">
-            <Link to="/conference"><img className="contentImg" src={assets.conference} alt="Conference" /></Link>
+          <div className="fullContent" onClick={() => handleNavigation("/conference")}>
+            <img className="contentImg" src={assets.conference} alt="Conference" />
             <p>Conference</p>
           </div>
 
-          <div className="fullContent">
-            <Link to="/auth"><img className="contentImg" src={assets.chat} alt="Chat" /></Link>
+          <div className="fullContent" onClick={() => handleNavigation("/chat")}>
+            <img className="contentImg" src={assets.chat} alt="Chat" />
             <p>Chat</p>
           </div>
 
-          <div className="fullContent">
-            <Link to="/note"><img className="contentImg" src={assets.note} alt="Note" /></Link>
+          <div className="fullContent" onClick={() => handleNavigation("/note")}>
+            <img className="contentImg" src={assets.noteIcon} alt="Note" />
             <p>Note</p>
           </div>
-
         </div>
-
-        {/* <button onClick={() => navigate("/")}>Get Started</button> */}
       </div>
     </div>
   );
