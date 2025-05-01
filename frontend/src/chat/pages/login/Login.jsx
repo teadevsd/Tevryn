@@ -77,8 +77,6 @@ const Login = () => {
     setErrors(newErrors);
 };
 
-
-
   const handlePhoneChange = (value) => {
     setData({ ...data, phoneNumber: value });
   };

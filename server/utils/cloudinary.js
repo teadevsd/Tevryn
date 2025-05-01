@@ -7,8 +7,6 @@ cloudinary.config({
     api_secret : process.env.CLOUDINARY_API_SECRET
 })
 
-
-
 const uploadImageCloudinary = async ( image ) =>{
     const buffer = image?.buffer || Buffer.from(await image.arrayBuffer()); //convert image to buffer
 
