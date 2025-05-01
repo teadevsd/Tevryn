@@ -52,54 +52,54 @@ exports.getAllContacts = async (req, res) => {
   }
 };
 
-  exports.handleSearch = async (req, res) => {
-      try {
-          const { query } = req.query;
-          const userId = req.user.id;
-  
-          if (!query) {
-              return res.status(400).json({ message: "Search query is required" });
-          }
-  
-          const user = await User.findOne({
-              $or: [{ email: query }, { username: query }],
+exports.handleSearch = async (req, res) => {
+  try {
+      const { query } = req.query;
+      const userId = req.user.id;  // Assuming req.user is set by Auth middleware
+
+      if (!query) {
+          return res.status(400).json({ message: "Search query is required" });
+      }
+
+      const user = await User.findOne({
+          $or: [{ email: query }, { username: query }],
+      });
+
+      if (user) {
+          // Check if the user is already in contacts
+          const existingContact = await contactModel.findOne({
+              owner: userId,
+              contactId: user._id,
           });
-  
-          if (user) {
-              // Check if the user is already in contacts
-              const existingContact = await contactModel.findOne({
+
+          if (!existingContact) {
+              await contactModel.create({
                   owner: userId,
                   contactId: user._id,
               });
-  
-              if (!existingContact) {
-                  await Contact.create({
-                      owner: userId,
-                      contactId: user._id,
-                  });
-              }
-  
-              return res.status(200).json({
-                  found: true,
-                  user: {
-                      id: user._id,
-                      username: user.username,
-                      email: user.email,
-                      avatar: user.avatar,
-                      bio: user.bio,
-                      lastSeen: user.lastSeen,
-                  },
-              });
-          } else {
-              return res.status(404).json({
-                  found: false,
-                  message: "User not found, you can send an invite instead",
-              });
           }
-      } catch (error) {
-          res.status(500).json({ message: "Error searching user", error });
+
+          return res.status(200).json({
+              found: true,
+              user: {
+                  id: user._id,
+                  username: user.username,
+                  email: user.email,
+                  avatar: user.avatar,
+                  bio: user.bio,
+                  lastSeen: user.lastSeen,
+              },
+          });
+      } else {
+          return res.status(404).json({
+              found: false,
+              message: "User not found, you can send an invite instead",
+          });
       }
-  };
+  } catch (error) {
+      res.status(500).json({ message: "Error searching user", error });
+  }
+}
 
   // Send friend request
 exports.sendFriendRequest = async (req, res) => {

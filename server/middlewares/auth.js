@@ -63,24 +63,63 @@ dotenv.config();
 
 
 
-exports.Auth = (req, res, next) => {
-    const authHeader = req.headers.authorization;
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
-        return res.status(401).json({ message: "No token provided", success: false });
+// exports.Auth = (req, res, next) => {
+//     const authHeader = req.headers.authorization;
+//     if (!authHeader || !authHeader.startsWith("Bearer ")) {
+//         return res.status(401).json({ message: "No token provided", success: false });
+//     }
+
+//     const token = authHeader.split(" ")[1];
+
+//     jwt.verify(token, process.env.SECRET_KEY_ACCESS_TOKEN, (err, decoded) => {
+//         if (err) {
+//             if (err.name === "TokenExpiredError") {
+//                 return res.status(401).json({ message: "Token expired, please log in again", success: false });
+//             }
+//             return res.status(401).json({ message: "Invalid token", success: false });
+//         }
+
+//         req.user = { userId: decoded.userId }; // ✅ Ensure correct userId extraction
+//         next();
+//     });
+// };
+
+// ✅ FIXED Auth middleware
+
+exports.Auth = async (req, res, next) => {
+  const authHeader = req.headers.authorization;
+
+  // Ensure the token exists and starts with "Bearer "
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return res.status(401).json({ message: "No token provided", success: false });
+  }
+
+  const token = authHeader.split(" ")[1]; // Get the token from the header
+
+  try {
+    // Decode the token and get the user ID from it
+    const decoded = jwt.verify(token, process.env.SECRET_KEY_ACCESS_TOKEN);
+
+    // Optionally, fetch the user from the database (to check if the user exists)
+    const user = await User.findById(decoded.userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found", success: false });
     }
 
-    const token = authHeader.split(" ")[1];
+    // Attach the user data to the request object (to be used later in controllers)
+    req.user = {
+      _id: user._id.toString(),
+      username: user.username,
+    };
 
-    jwt.verify(token, process.env.SECRET_KEY_ACCESS_TOKEN, (err, decoded) => {
-        if (err) {
-            if (err.name === "TokenExpiredError") {
-                return res.status(401).json({ message: "Token expired, please log in again", success: false });
-            }
-            return res.status(401).json({ message: "Invalid token", success: false });
-        }
+    next(); // Proceed to the next middleware or controller
+  } catch (err) {
+    if (err.name === "TokenExpiredError") {
+      return res.status(401).json({ message: "Token expired", success: false });
+    }
 
-        req.user = { userId: decoded.userId }; // ✅ Ensure correct userId extraction
-        next();
-    });
+    return res.status(401).json({ message: "Invalid token", success: false });
+  }
 };
+
 

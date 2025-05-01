@@ -29,7 +29,7 @@ exports.registerUser = async (req, res) => {
         email: emailLower,
         password: hashedPassword,
         phoneNumber,
-        avatar,
+        avatar, 
         bio,
         lastSeen: new Date(),
       });
@@ -90,32 +90,36 @@ exports.registerUser = async (req, res) => {
   
 
 exports.refreshToken = async (req, res) => {
-    const { refreshToken } = req.body; // ✅ Read from request body instead of cookies
-    if (!refreshToken) return res.status(401).json({ message: "No token provided" });
+    const refreshToken = req.cookies?.refreshToken; // ✅ Read from cookie
+  
+    if (!refreshToken)
+      return res.status(401).json({ message: "No token provided" });
   
     try {
       const decoded = jwt.verify(refreshToken, process.env.SECRET_KEY_REFRESH_TOKEN);
   
-      // ✅ Issue new tokens before removing old refresh token
-      const newAccessToken = exports.generateAccessToken(decoded.userId);
-      const newRefreshToken = exports.generateRefreshToken(decoded.userId);
+      const newAccessToken = generateAccessToken(decoded.userId);
+      const newRefreshToken =generateRefreshToken(decoded.userId);
   
-      // ✅ Store new refresh token before removing the old one
-      await User.updateOne({ _id: decoded.userId }, { $push: { refreshTokens: newRefreshToken } });
-      await User.updateOne({ _id: decoded.userId }, { $pull: { refreshTokens: refreshToken } });
+      // Optional: Rotate tokens (if storing refreshTokens in DB)
+      // await User.updateOne({ _id: decoded.userId }, { $push: { refreshTokens: newRefreshToken } });
+      // await User.updateOne({ _id: decoded.userId }, { $pull: { refreshTokens: refreshToken } });
   
-      // ✅ Send tokens as secure HTTP-only cookies
+      // ✅ Set new refresh token in cookie
       res.cookie("refreshToken", newRefreshToken, {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
         sameSite: "Strict",
+        maxAge: 7 * 24 * 60 * 60 * 1000,
       });
   
       res.json({ accessToken: newAccessToken });
     } catch (error) {
+      console.error("Refresh Token Error:", error);
       return res.status(403).json({ message: "Invalid or expired refresh token" });
     }
   };
+  
   
 
 
@@ -190,29 +194,29 @@ exports.refreshToken = async (req, res) => {
 
 exports.getUserProfile = async (req, res) => {
     try {
-        console.log("User ID from token:", req.user);
-
-        if (!req.user || !req.user.userId) {
-            return res.status(401).json({ message: "Unauthorized access", success: false });
-        }
-
-        const user = await User.findById(req.user.userId).select("-password");
-
-        if (!user) {
-            console.log("User not found in DB");
-            return res.status(404).json({ message: "User not found", success: false });
-        }
-
-        return res.status(200).json({
-            success: true,
-            data: user,
-        });
-
+      // Ensure that req.user exists (it should be attached by the Auth middleware)
+      if (!req.user || !req.user._id) {
+        return res.status(401).json({ message: "Unauthorized access", success: false });
+      }
+  
+      // Fetch user details from the database (excluding password)
+      const user = await User.findById(req.user._id).select("-password");
+  
+      if (!user) {
+        return res.status(404).json({ message: "User not found", success: false });
+      }
+  
+      // Return the user profile data in the response
+      return res.status(200).json({
+        success: true,
+        data: user,
+      });
     } catch (error) {
-        console.error("Error fetching profile:", error);
-        return res.status(500).json({ message: error.message, success: false });
+      console.error("Error fetching profile:", error);
+      return res.status(500).json({ message: error.message, success: false });
     }
-};
+  };
+  
 
 
 

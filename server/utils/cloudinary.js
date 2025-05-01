@@ -6,7 +6,7 @@ cloudinary.config({
     api_key : process.env.CLOUDINARY_API_KEY,
     api_secret : process.env.CLOUDINARY_API_SECRET
 })
-
+ 
 
 
 const uploadImageCloudinary = async ( image ) =>{
@@ -18,7 +18,7 @@ const uploadImageCloudinary = async ( image ) =>{
             return resolve(uploadResult);
         }).end(buffer);
     })
-    return uploadImage 
+    return uploadImage  
 }
 
 module.exports = uploadImageCloudinary

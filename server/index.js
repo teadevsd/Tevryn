@@ -1,67 +1,80 @@
+require("dotenv").config();
 const express = require("express");
 const http = require("http");
-const { Server } = require("socket.io");
-const mongoose = require("mongoose");
 const cors = require("cors");
-const dotenv = require("dotenv");
+const { Server } = require("socket.io");
+const cookieParser = require("cookie-parser");
+const { StreamChat } = require("stream-chat"); // ✅ Correct import
 const { connectDB } = require("./config/connectDB");
 const userRoute = require("./routes/chat/userRoute");
 const friendsRoute = require("./routes/chat/friendsRoute");
 const messageRoute = require("./routes/chat/messageRoute");
 const noteRoute = require("./routes/notes/noteRoute");
+const videoRoute = require("./routes/video/videoRoute");
+const socketHandler = require("./utils/socketHandler");
 
 
-const cookieParser = require("cookie-parser");
 
-dotenv.config();
+// ✅ Initialize Express
 const app = express();
-const server = http.createServer(app); // Create HTTP server for Socket.io
+const server = http.createServer(app);
 
+// ✅ Connect to Database
 connectDB();
 
-// Middleware
+// ✅ Middleware
 app.use(
   cors({
     origin: "http://localhost:5173",
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true,
-    allowedHeaders: ["Content-Type", "Authorization"],
-    methods: ["GET", "POST", "PUT", "DELETE"],
   })
 );
 app.use(express.json());
 app.use(cookieParser());
 
-// Routes
+// ✅ Initialize Stream Chat (For Token Generation)
+const apiKey = process.env.STREAM_API_KEY;
+const apiSecret = process.env.STREAM_API_SECRET;
+
 app.use("/api/v1/user", userRoute);
 app.use("/api/v1/friends", friendsRoute);
 app.use("/api/v1/messages", messageRoute);
+app.use("/api/v1/notes", noteRoute);
+app.use("/api/v1/video", videoRoute);
 
 
-//note-route
-app.use("/api/v1/note", noteRoute);
+if (!apiKey || !apiSecret) {
+  console.error("❌ Stream API keys are missing. Check .env file.");
+  process.exit(1);
+}
+
+const streamChatClient = StreamChat.getInstance(apiKey, apiSecret);
 
 
-
-// Initialize Socket.io
+// ✅ Initialize Socket.io
 const io = new Server(server, {
   cors: {
     origin: "http://localhost:5173",
-    methods: ["GET", "POST"],
   },
 });
 
+socketHandler(io); // ✅ attach handlers
+
+
 io.on("connection", (socket) => {
-  console.log("User Connected:", socket.id);
+  console.log(`🔗 User Connected: ${socket.id}`);
 
   socket.on("sendMessage", (data) => {
-    io.emit("receiveMessage", data); // Broadcast message to all clients
+    io.emit("receiveMessage", data);
   });
 
   socket.on("disconnect", () => {
-    console.log("User Disconnected:", socket.id);
+    console.log(`❌ User Disconnected: ${socket.id}`);
   });
 });
 
-// Start server
+// ✅ Start Server
 const PORT = process.env.PORT || 4000;
-server.listen(PORT, () => console.log(`✅ Server started on port ${PORT}`));
+server.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));

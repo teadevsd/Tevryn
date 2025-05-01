@@ -3,7 +3,7 @@ const noteModel = require("../../models/note/noteModel");
 
 exports.addNote = async (req, res) => {
     try {
-        if (!req.user || !req.user.userId) {
+        if (!req.user || !req.user._id)  {
             return res.status(401).json({ message: "Unauthorized", error: true });
         }
 
@@ -33,7 +33,7 @@ exports.editNote = async (req, res) => {
     const noteId = req.params.noteId;
     const { title, content, tags, isPinned } = req.body;
 
-    if (!req.user || !req.user.userId) {  // ✅ Fixed userId reference
+    if (!req.user || !req.user._id) {  // ✅ Fixed userId reference
         return res.status(401).json({ message: "Unauthorized", error: true, success: false });
     }
 
@@ -58,42 +58,43 @@ exports.editNote = async (req, res) => {
 };
 
 exports.getNotes = async (req, res) => {
-    if (!req.user || !req.user.userId) {
-        return res.status(401).json({ message: "Unauthorized", error: true, success: false });
+  if (!req.user || !req.user._id) {
+    return res.status(401).json({ message: "Unauthorized", error: true, success: false });
+  }
+
+  try {
+    const { search } = req.query;
+    const query = { userId: req.user._id }; // Use _id from the decoded token
+
+    if (search) {
+      query.$or = [
+        { title: { $regex: search, $options: "i" } }, // Case-insensitive search in title
+        { content: { $regex: search, $options: "i" } }, // Case-insensitive search in content
+        { tags: { $regex: search, $options: "i" } }, // Search within tags
+        { date: { $regex: search, $options: "i" } }, // If dates are stored as strings
+      ];
     }
 
-    try {
-        const { search } = req.query;
-        const query = { userId: req.user.userId };
+    const notes = await noteModel.find(query).sort({ isPinned: -1 });
 
-        if (search) {
-            query.$or = [
-                { title: { $regex: search, $options: "i" } }, // Case-insensitive search in title
-                { content: { $regex: search, $options: "i" } }, // Case-insensitive search in content
-                { tags: { $regex: search, $options: "i" } }, // Search within tags
-                { date: { $regex: search, $options: "i" } }, // If dates are stored as strings
-            ];
-        }
-
-        const notes = await noteModel.find(query).sort({ isPinned: -1 });
-
-        return res.status(200).json({
-            message: "Notes fetched successfully",
-            error: false,
-            success: true,
-            data: notes,
-        });
-    } catch (error) {
-        return res.status(500).json({ message: error.message || "Internal server error", error: true, success: false });
-    }
+    return res.status(200).json({
+      message: "Notes fetched successfully",
+      error: false,
+      success: true,
+      data: notes,
+    });
+  } catch (error) {
+    return res.status(500).json({ message: error.message || "Internal server error", error: true, success: false });
+  }
 };
+
 
 
 exports.deleteNote = async (req, res) => {
     try {
         const noteId = req.params.noteId;
 
-        if (!req.user || !req.user.userId) {  // ✅ Fixed userId reference
+        if (!req.user || !req.user._id)  {  // ✅ Fixed userId reference
             return res.status(401).json({ message: "Unauthorized", error: true, success: false });
         }
 
@@ -116,7 +117,7 @@ exports.updateNote = async (req, res) => {
         const noteId = req.params.noteId;
         const { isPinned } = req.body;
 
-        if (!req.user || !req.user.userId) {  
+        if (!req.user || !req.user._id)  {  
             console.error("User authentication failed. No userId found in request.");
             return res.status(401).json({ message: "Unauthorized", error: true, success: false });
         }
