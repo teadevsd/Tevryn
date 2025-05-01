@@ -6,7 +6,7 @@ const Axios = axios.create({
   headers: {
     "Content-Type": "application/json",
   },
-  withCredentials: true, // ✅ Ensures cookies are sent with every request
+  withCredentials: true, // Ensures cookies are sent with every request
 });
 
 // ✅ Refresh Token Function
@@ -14,8 +14,8 @@ const refreshToken = async () => {
   try {
     const response = await axios.post(
       `${baseURL}/${summaryAPI.refreshToken.url}`,
-      {}, // ✅ Empty body since the backend expects refresh token from cookies
-      { withCredentials: true } // ✅ Ensure cookies are sent
+      {},
+      { withCredentials: true }
     );
 
     if (response.data.accessToken) {
@@ -29,7 +29,7 @@ const refreshToken = async () => {
   }
 };
 
-// ✅ Attach token to all requests
+// ✅ Request Interceptor to attach token
 Axios.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("accessToken");
@@ -41,20 +41,29 @@ Axios.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// ✅ Handle expired tokens & auto-refresh
+// ✅ Response Interceptor for 401 handling
 Axios.interceptors.response.use(
   (response) => response,
   async (error) => {
-    if (error.response && error.response.status === 401) {
+    const originalRequest = error.config;
+
+    // 🔒 Prevent infinite loops
+    if (
+      error.response &&
+      error.response.status === 401 &&
+      !originalRequest._retry
+    ) {
+      originalRequest._retry = true;
       console.log("Token expired, attempting refresh...");
+
       const newToken = await refreshToken();
 
       if (newToken) {
-        error.config.headers.Authorization = `Bearer ${newToken}`;
-        localStorage.setItem("accessToken", newToken);
-        return Axios(error.config); // 🔥 Retries the same request
+        originalRequest.headers.Authorization = `Bearer ${newToken}`;
+        return Axios(originalRequest); // 🔁 Retry with new token
       }
     }
+
     return Promise.reject(error);
   }
 );

@@ -20,7 +20,8 @@ const HomeNote = () => {
   const [allNotes, setAllNotes] = useState([]);
   const [filteredNotes, setFilteredNotes] = useState([]);
 
-  useEffect(() => {
+
+useEffect(() => {
     const accessToken = localStorage.getItem("accessToken");
     if (!accessToken) {
       console.warn("No access token found! Redirecting to login...");
@@ -30,7 +31,7 @@ const HomeNote = () => {
     const getAllNotes = async () => {
       try {
         console.log("Fetching all notes...");
-        const response = await Axios.get(summaryAPI.getAllNotes.url, {
+        const response = await Axios.get('/api/v1/notes/get-note', {
           headers: { Authorization: `Bearer ${accessToken}` },
         });
 

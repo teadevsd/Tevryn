@@ -70,23 +70,28 @@ export const summaryAPI = {
             
     //note
     getAllNotes: {
-        url: 'api/v1/note/get-note',
+        url: 'api/v1/notes/get-note',
         method: 'get'
     },
     addNote: {
-        url: 'api/v1/note/add-note',
+        url: 'api/v1/notes/add-note',
         method: 'post'
     },
     editNote: {
-        url: 'api/v1/note/edit-note/',
+        url: 'api/v1/notes/edit-note/',
         method: 'put'
     },
     updateNote: {
-        url: 'api/v1/note/update-note/',
+        url: 'api/v1/notes/update-note/',
         method: 'put'
     },
     deleteNote: {
-        url: 'api/v1/note/delete-note/',
+        url: 'api/v1/notes/delete-note/',
         method: 'delete'
+    },
+    //video
+    generateToken: {
+        url: 'api/v1/video/generate-token',
+        method: 'post'
     }
 }

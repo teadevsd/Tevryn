@@ -1,0 +1,52 @@
+.modalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5); /* Keeps the background slightly dark */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(5px); /* Blurs only the background */
+    z-index: 1000;
+}
+
+.modalContent {
+    background: #1e293b;
+    padding: 20px;
+    border-radius: 8px;
+    text-align: center;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    z-index: 1001;
+    width: 400px;
+
+    h2 {
+        font-size: 20px;
+    }
+}
+
+.startBtn, .closeBtn {
+    padding: 8px 16px;
+    margin: 20px;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+    font-size: 13px;
+}
+
+.startBtn {
+    background: #ff6200;
+    color: white;
+}
+
+.closeBtn {
+    background: gray;
+    color: white;
+}
+
+@media (max-width: 768px) {
+    .modalContent {
+        width: 310px;
+    }
+}

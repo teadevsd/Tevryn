@@ -1,0 +1,101 @@
+.homeConferenceContent {
+    margin-top: 20px;
+}
+.conferenceContent {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    overflow: hidden; /* Prevents scrolling */
+}
+
+.homebBanner {
+    position: relative; /* Needed for absolute positioning of h2 */
+    width: 100%;
+    height: 250px;
+}
+
+.homebBanner img {
+    width: 100%;  /* Make it take full width */
+    height: 280px; /* Maintain aspect ratio */
+    border-radius: 20px;
+    object-fit: cover; /* Prevents stretching */
+}
+/* ========== Glassmorphism for Upcoming Meeting ========== */
+.homeContent {
+    position: absolute;
+    top: 15%;
+    left: 20px; /* Align to left */
+    padding: 15px 20px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.homeContent h2 {
+    font-size: 20px;
+    font-weight: bold;
+    color: white;
+    text-align: left;
+    margin: 0;
+}
+/* ========== Time & Date (NO Glassmorphism) ========== */
+.realTime {
+    position: absolute;
+    top: 50%;
+    left: 30px; /* Align to left */
+    display: flex;
+    flex-direction: column;
+}
+
+.realTime h1 {
+    font-size: 60px;
+    font-weight: bold;
+    color: white;
+    text-align: left;
+    
+}
+
+.realTime p {
+    font-size: 16px;
+    color: white;
+    text-align: left;
+    
+}
+
+/* ========== Mobile Responsiveness ========== */
+@media (max-width: 768px) {
+    .conferenceContent {
+        overflow: scroll;
+    }
+    .homeContent {
+        width: 80%;
+        left: 10px;
+        padding: 10px 15px;
+    }
+
+    .homeContent h2 {
+        font-size: 16px;
+    }
+
+    .realTime {
+        top: 40%;
+        left: 10px;
+    }
+
+    .realTime h1 {
+        font-size: 40px;
+    }
+
+    .realTime p {
+        font-size: 14px;
+    }
+
+    .homebBanner img {
+        object-fit: cover;
+        height: 250px;
+    }
+}

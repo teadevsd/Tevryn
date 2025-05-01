@@ -1,0 +1,77 @@
+.mobileNavWrapper {
+    position: fixed;
+    top: 10px;
+    right: 10px; /* Move button to the right */
+    z-index: 100;
+}
+
+.menu-button {
+    background: none;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    font-size: 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    display: none;
+    &:hover {
+        background: none;
+    }
+}
+
+/* Make sure Close (X) and Hamburger (☰) are centered */
+.menu-button svg {
+    vertical-align: middle;
+}
+
+
+/* Mobile Menu */
+.mobileMenu {
+    margin-top: 50px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    /* padding: 20px; */
+}
+
+/* Sidebar Links */
+.sideLink {
+    display: flex;
+    align-items: center;
+    gap: 15px;  /* Ensure spacing between image and text */
+    text-decoration: none;
+    padding: 10px;
+    border-radius: 5px;
+    transition: background 0.3s ease;
+}
+
+/* Active Link */
+.sideLink.active {
+    background: #1e293b;
+}
+
+/* Ensure Image Moves to Left */
+.sideLink img {
+    display: block;
+    width: 24px;
+    height: 24px;
+}
+
+/* Ensure Labels are Visible */
+.menu-label {
+    font-size: 16px;
+    font-weight: 500;
+    color: white;
+    white-space: nowrap; /* Prevent text wrapping */
+    visibility: visible !important; /* Force visibility */
+}
+
+@media (max-width: 768px) {
+    .menu-button {
+        display: block;
+    }
+}

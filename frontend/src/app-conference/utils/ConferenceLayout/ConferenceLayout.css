@@ -1,0 +1,51 @@
+/* ========== General Layout ========== */
+.conferenceWrapper {
+    display: flex;
+    flex-direction: column;
+    width: 100vw;
+    height: 100vh;
+    background-color: #0d1117;
+    overflow: hidden; /* Prevents extra scrolling */
+}
+
+.conferenceContent {
+    flex: 1;
+    display: flex;
+    width: 100%;
+}
+
+
+
+/* ========== Page Content ========== */
+.pageContent {
+    flex: 1;
+    display: flex;
+    /* align-items: center; */
+    justify-content: center;
+    padding: 20px;
+    color: white;
+    font-size: 16px;
+    background-color: #0d1117;
+    text-align: center;
+    min-height: 100%;
+}
+
+/* Ensure content adjusts when sidebar shrinks */
+/* Remove margin-left on mobile */
+@media (max-width: 768px) {
+    .conferenceContent {
+        margin-left: 0; /* Ensure full width */
+    }
+
+    .pageContent {
+        padding: 10px; /* Reduce padding if needed */
+    }
+
+    .pageContent h1 {
+        text-align: center;
+        margin: 0 auto; /* Ensure centering */
+        width: 100%;
+    }
+}
+
+

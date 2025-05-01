@@ -35,7 +35,7 @@
 
 /* Pinned Note Styling */
 .noteCard.pinned {
-    border-left: 5px solid rgb(216, 53, 4);
+    border-left: 5px solid rgb(4, 122, 22);
     background: #f7e7b06a;
 }
 
@@ -67,7 +67,7 @@
 .noteActions svg {
     cursor: pointer;
     font-size: 18px;
-    color: rgb(65, 16, 16);
+    color: rgb(16, 65, 25);
     transition: color 0.2s;
 }
 

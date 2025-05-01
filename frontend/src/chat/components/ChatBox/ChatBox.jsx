@@ -2,17 +2,15 @@ import React, { useContext, useEffect, useState, useRef } from "react";
 import { io } from "socket.io-client";
 import "./ChatBox.css";
 import assets from "../../../assets/assets";
-
 import Axios from "../../../lib/Axios";
 import SelectChat from "../SelectChat/SelectChat";
 import RightSideBar from "../RightSideBar/RightSideBar";
 import { summaryAPI } from "../../../common/summaryAPI";
 import { AppContext } from "../../../context/AppContext";
 
-const socket = io("http://localhost:2323");
-
 const ChatBox = ({ chatUser }) => {
   const { userData } = useContext(AppContext);
+  const socket = useRef(null); // ✅ Prevent multiple socket instances
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -21,17 +19,16 @@ const ChatBox = ({ chatUser }) => {
   // Fetch messages when chatUser changes
   useEffect(() => {
     const fetchMessages = async () => {
-      if (!chatUser) return;
+      if (!chatUser || !userData?.username) return;
       try {
         const response = await Axios({
           ...summaryAPI.getMessages,
           params: {
-            sender: userData?.username || "user",
+            sender: userData.username,
             receiver: chatUser.username,
           },
         });
 
-        // Sort messages (oldest first)
         setMessages(response.data.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp)));
       } catch (error) {
         console.error("Error fetching messages:", error);
@@ -39,19 +36,25 @@ const ChatBox = ({ chatUser }) => {
     };
 
     fetchMessages();
-  }, [chatUser]);
+  }, [chatUser, userData?.username]);
 
-  // Listen for new messages
+  // Initialize socket and listeners once
   useEffect(() => {
-    socket.on("receiveMessage", (message) => {
-        setMessages((prevMessages) => [...prevMessages, message]);
+    if (!userData?.username) return;
+
+    socket.current = io("http://localhost:2323"); // ✅ only one socket instance
+    socket.current.emit("join", userData.username); // ✅ user joins personal room
+
+    socket.current.on("receiveMessage", (message) => {
+      setMessages((prevMessages) => [...prevMessages, message]);
     });
 
     return () => {
-        socket.off("receiveMessage");
+      if (socket.current) {
+        socket.current.disconnect(); // ✅ cleanup socket on unmount
+      }
     };
-}, []);
-
+  }, [userData?.username]);
 
   // Auto-scroll to latest message
   useEffect(() => {
@@ -63,16 +66,15 @@ const ChatBox = ({ chatUser }) => {
     if (!newMessage.trim()) return;
 
     const messageData = {
-        sender: userData?.username || "user",
-        receiver: chatUser?.username,
-        text: newMessage,
-        timestamp: new Date().toISOString(),
+      sender: userData.username,
+      receiver: chatUser?.username,
+      text: newMessage,
+      timestamp: new Date().toISOString(),
     };
 
-    socket.emit("sendMessage", messageData);
-    setNewMessage(""); // Clear input after sending
-};
-
+    socket.current.emit("sendMessage", messageData); // Emit message to server
+    setNewMessage(""); // Reset input field only after sending
+  };
 
   return (
     <div className="chat-container">
@@ -90,18 +92,27 @@ const ChatBox = ({ chatUser }) => {
             {/* Chat Messages */}
             <div className="chat-message">
               {messages.map((msg, index) => (
-                <div key={index} className={msg.sender === userData?.username ? "sender-message" : "reader-message"}>
+                <div
+                  key={index}
+                  className={msg.sender === userData.username ? "sender-message" : "reader-message"}
+                >
                   <p className="msg">{msg.text}</p>
                   <div>
-                  <img
-                    src={msg.sender === userData?.username 
-                      ? userData?.avatar || assets.profile_img  // ✅ Use userData.avatar for messages sent by the logged-in user
-                      : chatUser?.avatar || assets.profile_img  // ✅ Use chatUser.avatar for messages received
-                    }
-                    alt="User"
-                  />
-
-                    <p className="msg-time">{new Date(msg.timestamp).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hour12: true })}</p>
+                    <img
+                      src={
+                        msg.sender === userData.username
+                          ? userData.avatar || assets.profile_img
+                          : chatUser.avatar || assets.profile_img
+                      }
+                      alt="User"
+                    />
+                    <p className="msg-time">
+                      {new Date(msg.timestamp).toLocaleTimeString([], {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                        hour12: true,
+                      })}
+                    </p>
                   </div>
                 </div>
               ))}
@@ -110,21 +121,19 @@ const ChatBox = ({ chatUser }) => {
 
             {/* Chat Input */}
             <div className="chat-input">
-             <textarea
+              <textarea
                 placeholder="Type a message..."
                 value={newMessage}
                 onChange={(e) => setNewMessage(e.target.value)}
                 onKeyDown={(e) => {
-                    if (e.key === "Enter" && !e.shiftKey) {
-                        e.preventDefault(); // Prevent new line on Enter (unless Shift is held)
-                        sendMessage();
-                    }
+                  if (e.key === "Enter" && !e.shiftKey) {
+                    e.preventDefault();
+                    sendMessage(); // Prevent enter key default action and send message
+                  }
                 }}
               />
-
-              
               <label htmlFor="gallery">
-                <img src={assets.gallery_icon} alt="Gallery" />	  	
+                <img src={assets.gallery_icon} alt="Gallery" />
               </label>
               <img src={assets.send_button} alt="Send" onClick={sendMessage} />
             </div>

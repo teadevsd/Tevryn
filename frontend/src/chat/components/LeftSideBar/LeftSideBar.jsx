@@ -20,19 +20,15 @@ const LeftSideBar = ({ onSelectUser }) => {
     const fetchContacts = async () => {
       try {
         const accessToken = localStorage.getItem("accessToken");
-        console.log("Token Being Sent in Request:", accessToken); // Debugging
-  
         if (!accessToken) {
           console.error("No access token found in localStorage.");
           return;
         }
-  
+    
         const response = await Axios.get(summaryAPI.getUserProfile.url, {
           headers: { Authorization: `Bearer ${accessToken}` },
         });
-  
-        console.log("Response from Server:", response.data); // Debugging
-  
+    
         if (response.data.success && response.data.data) {
           const contact = response.data.data;
           setContacts([
@@ -51,6 +47,7 @@ const LeftSideBar = ({ onSelectUser }) => {
         console.error("Error fetching contacts:", error.response?.data || error.message);
       }
     };
+    
     fetchContacts();
   }, []);
   
@@ -69,33 +66,35 @@ const LeftSideBar = ({ onSelectUser }) => {
   const handleSearch = async () => {
     setLoading(true);
     try {
-      const response = await Axios({
-        ...summaryAPI.searchUser,
-        params: { query: searchQuery },
-      });
-      
-      if (response.data?.found) {
-        const foundUser = response.data.user;
-        setSearchResult({
-          found: true,
-          id: foundUser.id,
-          username: foundUser.username,
-          email: foundUser.email,
-          avatar: foundUser.avatar || assets.profile_img,
-          bio: foundUser.bio?.trim() !== "" ? foundUser.bio : "No bio available",
-          online: foundUser.lastSeen ? checkOnlineStatus(foundUser.lastSeen) : false,
-          lastSeen: foundUser.lastSeen ? formatLastSeen(foundUser.lastSeen) : "Last seen unavailable",
-        });
-      } else {
-        setSearchResult({ found: false, message: "User not found, you can send an invite instead" });
-      }
+       const response = await Axios({
+          ...summaryAPI.searchUser, // Ensure this is the correct API configuration
+          params: { query: searchQuery },
+       });
+ 
+       if (response.data?.found) {
+          const foundUser = response.data.user;
+          setSearchResult({
+             found: true,
+             id: foundUser.id,
+             username: foundUser.username,
+             email: foundUser.email,
+             avatar: foundUser.avatar || assets.profile_img,
+             bio: foundUser.bio?.trim() !== "" ? foundUser.bio : "No bio available",
+             online: foundUser.lastSeen ? checkOnlineStatus(foundUser.lastSeen) : false,
+             lastSeen: foundUser.lastSeen ? formatLastSeen(foundUser.lastSeen) : "Last seen unavailable",
+          });
+       } else {
+          setSearchResult({ found: false, message: "User not found, you can send an invite instead" });
+       }
+       
     } catch (error) {
-      console.error("Search API error:", error);
-      setSearchResult({ found: false, message: "User not found, you can send an invite instead" });
+       console.error("Search API error:", error);
+       setSearchResult({ found: false, message: "User not found, you can send an invite instead" });
     } finally {
-      setLoading(false);
+       setLoading(false);
     }
-  };
+ };
+ 
 
   const checkOnlineStatus = (lastSeen) => {
     if (!lastSeen) return false;
